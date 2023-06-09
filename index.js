@@ -85,14 +85,9 @@ window.onload = async () => {
     let lasticocords;
 
     loginfo("Getting geo data");
-    let geo = await fetch(
-      geoURL || "https://erth2.github.io/movc/geo/geo.geojson"
-    );
+    let geo = await fetch(geoURL);
     loginfo("Getting country data");
-    let coarray = await fetch(
-      countryInfoUrl ||
-        "https://erth2.github.io/movc/geo/countries/countries.json"
-    );
+    let coarray = await fetch(countryInfoUrl);
     coarray = await coarray.json();
     let countries = {};
     for (let i = 0; i < coarray.length; i++)
