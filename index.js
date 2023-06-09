@@ -58,7 +58,7 @@ window.onload = async () => {
 
   movc.on("load", async () => {
     movc.loadImage(
-      "https://cime.github.io/map/icons/city.png",
+      "https://cimengine.github.io/map/icons/city.png",
       (error, image) => {
         if (error) throw error;
         movc.addImage("city", image);
@@ -66,7 +66,7 @@ window.onload = async () => {
     );
 
     movc.loadImage(
-      "https://cime.github.io/map/icons/capital.png",
+      "https://cimengine.github.io/map/icons/capital.png",
       (error, image) => {
         if (error) throw error;
         movc.addImage("capital-city", image);
@@ -75,7 +75,7 @@ window.onload = async () => {
     );
 
     movc.loadImage(
-      "https://cime.github.io/map/icons/landmark.png",
+      "https://cimengine.github.io/map/icons/landmark.png",
       (error, image) => {
         if (error) throw error;
         movc.addImage("landmark-0", image);
