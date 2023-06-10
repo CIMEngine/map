@@ -40,9 +40,13 @@ window.onload = async () => {
     get: (searchParams, prop) => searchParams.get(prop),
   });
 
-  const projection = params.projection;
-  const geoURL = params.geoURL;
-  const countryInfoUrl = params.countryInfoUrl;
+  const projection = params.projection || "globe";
+  const geoURL =
+    params.geoURL ||
+    "https://raw.githubusercontent.com/CIMEngine/WorldMap/main/map/geo.geojson";
+  const countryInfoUrl =
+    params.countryInfoUrl ||
+    "https://raw.githubusercontent.com/CIMEngine/WorldMap/main/map/src/countries.json";
 
   mapboxgl.accessToken =
     "pk.eyJ1IjoiYXJ0ZWdvc2VyIiwiYSI6ImNrcDViN3BhcDAwbW0ydnBnOXZ0ZzFreXUifQ.FIVtaBNr9dr_TIw672Zqdw";
@@ -51,7 +55,7 @@ window.onload = async () => {
     style: "mapbox://styles/artegoser/clfm612fg002601nlcika2018",
     center: [53.19, 41.28],
     zoom: 3,
-    projection: projection || "globe",
+    projection: projection,
   });
 
   let converter = new showdown.Converter();
