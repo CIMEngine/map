@@ -1,3 +1,5 @@
-# WIP
+# CIMEngine map
 
-Documentation will be here shortly
+Site that displays CIMEngine maps
+
+URL - <https://cimengine.github.io/map/>
