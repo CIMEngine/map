@@ -32,7 +32,7 @@ function logoccupation(...str) {
 }
 
 function onMapClick(e) {
-  loginfo("Даблклик", e.latlng.toString());
+  loginfo("click on:", e.latlng.toString());
 }
 
 window.onload = async () => {
@@ -163,7 +163,7 @@ window.onload = async () => {
             `
                 ${
                   feature?.properties?.amount
-                    ? `<div class="row glass" style="color: "white";"><div class="col">Население - ${feature.properties.amount} чел.</div></div>`
+                    ? `<div class="row glass" style="color: "white";"><div class="col">Population - ${feature.properties.amount} people.</div></div>`
                     : ""
                 }
                 <div class="row" style="padding: 5px;">
@@ -223,7 +223,7 @@ window.onload = async () => {
                                   )}
                             </div>
                             <div class="col-12 text-center glass"> 
-                                  Основание: ${country.date}
+                                Founding date: ${country.date}
                             </div>
                             <div class="col-md-12 col-sm-12 text-center glass">
                               ${
@@ -237,7 +237,7 @@ window.onload = async () => {
                             <div class="col-12 text-center mt-2">
                               ${
                                 country.about
-                                  ? `<a href="${country.about}" class="about">Подробнее</a>`
+                                  ? `<a href="${country.about}" class="about">About</a>`
                                   : ""
                               }
                             </div>
