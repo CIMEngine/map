@@ -41,12 +41,18 @@ window.onload = async () => {
   });
 
   const projection = params.projection || "globe";
-  const geoURL =
-    params.geoURL ||
-    "https://raw.githubusercontent.com/CIMEngine/WorldMap/main/map/geo.geojson";
-  const countryInfoUrl =
-    params.countryInfoUrl ||
-    "https://raw.githubusercontent.com/CIMEngine/WorldMap/main/map/src/countries.json";
+  const mapId = params.id || "worldMap";
+
+  let mapDataFromId = (
+    await (
+      await fetch(
+        `https://raw.githubusercontent.com/CIMEngine/MapList/main/index.json`
+      )
+    ).json()
+  )[mapId];
+
+  const geoURL = params.geoURL || mapDataFromId.geoURL;
+  const countryInfoUrl = params.countryInfoURL || mapDataFromId.countryInfoURL;
 
   mapboxgl.accessToken =
     "pk.eyJ1IjoiYXJ0ZWdvc2VyIiwiYSI6ImNrcDViN3BhcDAwbW0ydnBnOXZ0ZzFreXUifQ.FIVtaBNr9dr_TIw672Zqdw";
