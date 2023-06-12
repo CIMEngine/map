@@ -83,7 +83,7 @@ window.onload = async () => {
 
   let converter = new showdown.Converter();
 
-  map.on("load", async () => {
+  map.on("style.load", async () => {
     map.loadImage(
       "https://cimengine.github.io/map/icons/city.png",
       (error, image) => {
