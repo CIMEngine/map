@@ -58,7 +58,7 @@ window.onload = async () => {
     "pk.eyJ1IjoiYXJ0ZWdvc2VyIiwiYSI6ImNrcDViN3BhcDAwbW0ydnBnOXZ0ZzFreXUifQ.FIVtaBNr9dr_TIw672Zqdw";
   let movc = new mapboxgl.Map({
     container: "map",
-    style: "mapbox://styles/artegoser/clfm612fg002601nlcika2018",
+    style: "mapbox://styles/artegoser/clfm612fg002601nlcika2018?optimize=true",
     center: [53.19, 41.28],
     zoom: 3,
     projection: projection,
