@@ -1,3 +1,10 @@
+import {
+  StylesControl,
+  ZoomControl,
+  CompassControl,
+  InspectControl,
+} from "mapbox-gl-controls";
+
 function loginfo(...str) {
   let info = str.shift();
   console.log(
@@ -6,35 +13,6 @@ function loginfo(...str) {
     ...str
   );
 }
-function logmarker(...str) {
-  let info = str.shift();
-  console.log(
-    `%c ${info} `,
-    "color:white; background-color: #9300fc; border-radius:10px;",
-    ...str
-  );
-}
-function logland(...str) {
-  let info = str.shift();
-  console.log(
-    `%c ${info} `,
-    "color:white; background-color: #0c7700; border-radius:10px;",
-    ...str
-  );
-}
-function logoccupation(...str) {
-  let info = str.shift();
-  console.log(
-    `%c ${info} `,
-    "color:white; background-color: #B22222; border-radius:10px;",
-    ...str
-  );
-}
-
-function onMapClick(e) {
-  loginfo("click on:", e.latlng.toString());
-}
-
 window.onload = async () => {
   const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
@@ -53,10 +31,11 @@ window.onload = async () => {
 
   const geoURL = params.geoURL || mapDataFromId.geoURL;
   const countryInfoUrl = params.countryInfoURL || mapDataFromId.countryInfoURL;
+  const debug = params.debug || false;
 
   mapboxgl.accessToken =
     "pk.eyJ1IjoiYXJ0ZWdvc2VyIiwiYSI6ImNrcDViN3BhcDAwbW0ydnBnOXZ0ZzFreXUifQ.FIVtaBNr9dr_TIw672Zqdw";
-  let movc = new mapboxgl.Map({
+  let map = new mapboxgl.Map({
     container: "map",
     style: "mapbox://styles/artegoser/clfm612fg002601nlcika2018?optimize=true",
     center: [53.19, 41.28],
@@ -64,31 +43,69 @@ window.onload = async () => {
     projection: projection,
   });
 
+  map.addControl(
+    new StylesControl({
+      styles: [
+        {
+          label: "Streets",
+          styleName: "Mapbox Streets",
+          styleUrl:
+            "mapbox://styles/artegoser/clfm612fg002601nlcika2018?optimize=true",
+        },
+        {
+          label: "Satellite",
+          styleName: "Satellite",
+          styleUrl:
+            "mapbox://styles/artegoser/cliskjlhw00ug01pgfs9lesog?optimize=true",
+        },
+      ],
+    }),
+    "top-left"
+  );
+
+  map.addControl(new ZoomControl(), "top-right");
+  map.addControl(new CompassControl(), "top-right");
+  map.addControl(
+    new MapboxExportControl({
+      PageSize: Size.A3,
+      PageOrientation: PageOrientation.Portrait,
+      Format: Format.PNG,
+      DPI: DPI[96],
+      Crosshair: true,
+      PrintableArea: true,
+    }),
+    "top-right"
+  );
+
+  if (debug) {
+    map.addControl(new InspectControl(), "bottom-right");
+  }
+
   let converter = new showdown.Converter();
 
-  movc.on("load", async () => {
-    movc.loadImage(
+  map.on("load", async () => {
+    map.loadImage(
       "https://cimengine.github.io/map/icons/city.png",
       (error, image) => {
         if (error) throw error;
-        movc.addImage("city", image);
+        map.addImage("city", image);
       }
     );
 
-    movc.loadImage(
+    map.loadImage(
       "https://cimengine.github.io/map/icons/capital.png",
       (error, image) => {
         if (error) throw error;
-        movc.addImage("capital-city", image);
-        movc.addImage("capital", image);
+        map.addImage("capital-city", image);
+        map.addImage("capital", image);
       }
     );
 
-    movc.loadImage(
+    map.loadImage(
       "https://cimengine.github.io/map/icons/landmark.png",
       (error, image) => {
         if (error) throw error;
-        movc.addImage("landmark-0", image);
+        map.addImage("landmark-0", image);
       }
     );
 
@@ -101,12 +118,12 @@ window.onload = async () => {
     for (let i = 0; i < coarray.length; i++)
       countries[coarray[i].idc] = coarray[i];
 
-    movc.addSource("map-data", {
+    map.addSource("map-data", {
       type: "geojson",
       data: geoURL,
     });
 
-    movc.addLayer({
+    map.addLayer({
       id: "map-data-fill",
       type: "fill",
       source: "map-data",
@@ -116,7 +133,7 @@ window.onload = async () => {
       },
     });
 
-    movc.addLayer({
+    map.addLayer({
       id: "map-data-fill-outline",
       type: "line",
       source: "map-data",
@@ -127,7 +144,7 @@ window.onload = async () => {
       },
     });
 
-    movc.addLayer({
+    map.addLayer({
       id: "map-data-symbol",
       type: "symbol",
       source: "map-data",
@@ -138,7 +155,7 @@ window.onload = async () => {
       minzoom: 3,
     });
 
-    movc.on("click", "map-data-fill", (e) => {
+    map.on("click", "map-data-fill", (e) => {
       const coordinates = e.lngLat;
       while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
@@ -147,7 +164,7 @@ window.onload = async () => {
       onEachFeature(e.features[0], coordinates);
     });
 
-    movc.on("click", "map-data-symbol", (e) => {
+    map.on("click", "map-data-symbol", (e) => {
       const coordinates = e.lngLat;
       while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
@@ -193,7 +210,7 @@ window.onload = async () => {
                 </div>
                 `
           )
-          .addTo(movc);
+          .addTo(map);
       } else if (
         feature.geometry.type === "Polygon" ||
         feature.geometry.type === "MultiPolygon"
@@ -245,7 +262,7 @@ window.onload = async () => {
                             </div>
                     </div>`
                 )
-                .addTo(movc);
+                .addTo(map);
         }, 1);
       }
     }

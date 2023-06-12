@@ -1,0 +1,22 @@
+{
+  "name": "map",
+  "version": "1.0.0",
+  "description": "Site that displays CIMEngine maps",
+  "main": "index.js",
+  "scripts": {
+    "build": "rollup --config src/rollup.config.js"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.1",
+    "@rollup/plugin-node-resolve": "^15.1.0",
+    "rollup": "^3.25.1",
+    "rollup-plugin-copy": "^3.4.0"
+  },
+  "dependencies": {
+    "mapbox-gl-controls": "^2.3.5"
+  }
+}
