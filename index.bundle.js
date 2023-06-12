@@ -740,9 +740,9 @@
                                     </h5>
                             </div>
                             <div class="col-12 text-center glass"> 
-                                  ${JSON.parse(feature.properties.tags).join(
-                                    ", "
-                                  )}
+                                  ${JSON.parse(
+                                    feature.properties.tags || "[]"
+                                  ).join(", ")}
                             </div>
                             <div class="col-12 text-center glass"> 
                                 Founding date: ${country.date}
