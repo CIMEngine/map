@@ -94,8 +94,6 @@ window.onload = async () => {
 
     let lasticocords;
 
-    loginfo("Getting geo data");
-    let geo = await fetch(geoURL);
     loginfo("Getting country data");
     let coarray = await fetch(countryInfoUrl);
     coarray = await coarray.json();
@@ -103,11 +101,9 @@ window.onload = async () => {
     for (let i = 0; i < coarray.length; i++)
       countries[coarray[i].idc] = coarray[i];
 
-    let geojson = await geo.json();
-
     movc.addSource("map-data", {
       type: "geojson",
-      data: geojson,
+      data: geoURL,
     });
 
     movc.addLayer({
