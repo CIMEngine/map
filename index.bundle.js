@@ -508,6 +508,345 @@
         }
     }
 
+    /**
+     * Callback for geomEach
+     *
+     * @callback geomEachCallback
+     * @param {Geometry} currentGeometry The current Geometry being processed.
+     * @param {number} featureIndex The current index of the Feature being processed.
+     * @param {Object} featureProperties The current Feature Properties being processed.
+     * @param {Array<number>} featureBBox The current Feature BBox being processed.
+     * @param {number|string} featureId The current Feature Id being processed.
+     */
+
+    /**
+     * Iterate over each geometry in any GeoJSON object, similar to Array.forEach()
+     *
+     * @name geomEach
+     * @param {FeatureCollection|Feature|Geometry} geojson any GeoJSON object
+     * @param {Function} callback a method that takes (currentGeometry, featureIndex, featureProperties, featureBBox, featureId)
+     * @returns {void}
+     * @example
+     * var features = turf.featureCollection([
+     *     turf.point([26, 37], {foo: 'bar'}),
+     *     turf.point([36, 53], {hello: 'world'})
+     * ]);
+     *
+     * turf.geomEach(features, function (currentGeometry, featureIndex, featureProperties, featureBBox, featureId) {
+     *   //=currentGeometry
+     *   //=featureIndex
+     *   //=featureProperties
+     *   //=featureBBox
+     *   //=featureId
+     * });
+     */
+    function geomEach(geojson, callback) {
+      var i,
+        j,
+        g,
+        geometry,
+        stopG,
+        geometryMaybeCollection,
+        isGeometryCollection,
+        featureProperties,
+        featureBBox,
+        featureId,
+        featureIndex = 0,
+        isFeatureCollection = geojson.type === "FeatureCollection",
+        isFeature = geojson.type === "Feature",
+        stop = isFeatureCollection ? geojson.features.length : 1;
+
+      // This logic may look a little weird. The reason why it is that way
+      // is because it's trying to be fast. GeoJSON supports multiple kinds
+      // of objects at its root: FeatureCollection, Features, Geometries.
+      // This function has the responsibility of handling all of them, and that
+      // means that some of the `for` loops you see below actually just don't apply
+      // to certain inputs. For instance, if you give this just a
+      // Point geometry, then both loops are short-circuited and all we do
+      // is gradually rename the input until it's called 'geometry'.
+      //
+      // This also aims to allocate as few resources as possible: just a
+      // few numbers and booleans, rather than any temporary arrays as would
+      // be required with the normalization approach.
+      for (i = 0; i < stop; i++) {
+        geometryMaybeCollection = isFeatureCollection
+          ? geojson.features[i].geometry
+          : isFeature
+          ? geojson.geometry
+          : geojson;
+        featureProperties = isFeatureCollection
+          ? geojson.features[i].properties
+          : isFeature
+          ? geojson.properties
+          : {};
+        featureBBox = isFeatureCollection
+          ? geojson.features[i].bbox
+          : isFeature
+          ? geojson.bbox
+          : undefined;
+        featureId = isFeatureCollection
+          ? geojson.features[i].id
+          : isFeature
+          ? geojson.id
+          : undefined;
+        isGeometryCollection = geometryMaybeCollection
+          ? geometryMaybeCollection.type === "GeometryCollection"
+          : false;
+        stopG = isGeometryCollection
+          ? geometryMaybeCollection.geometries.length
+          : 1;
+
+        for (g = 0; g < stopG; g++) {
+          geometry = isGeometryCollection
+            ? geometryMaybeCollection.geometries[g]
+            : geometryMaybeCollection;
+
+          // Handle null Geometry
+          if (geometry === null) {
+            if (
+              callback(
+                null,
+                featureIndex,
+                featureProperties,
+                featureBBox,
+                featureId
+              ) === false
+            )
+              return false;
+            continue;
+          }
+          switch (geometry.type) {
+            case "Point":
+            case "LineString":
+            case "MultiPoint":
+            case "Polygon":
+            case "MultiLineString":
+            case "MultiPolygon": {
+              if (
+                callback(
+                  geometry,
+                  featureIndex,
+                  featureProperties,
+                  featureBBox,
+                  featureId
+                ) === false
+              )
+                return false;
+              break;
+            }
+            case "GeometryCollection": {
+              for (j = 0; j < geometry.geometries.length; j++) {
+                if (
+                  callback(
+                    geometry.geometries[j],
+                    featureIndex,
+                    featureProperties,
+                    featureBBox,
+                    featureId
+                  ) === false
+                )
+                  return false;
+              }
+              break;
+            }
+            default:
+              throw new Error("Unknown Geometry Type");
+          }
+        }
+        // Only increase `featureIndex` per each feature
+        featureIndex++;
+      }
+    }
+
+    /**
+     * Callback for geomReduce
+     *
+     * The first time the callback function is called, the values provided as arguments depend
+     * on whether the reduce method has an initialValue argument.
+     *
+     * If an initialValue is provided to the reduce method:
+     *  - The previousValue argument is initialValue.
+     *  - The currentValue argument is the value of the first element present in the array.
+     *
+     * If an initialValue is not provided:
+     *  - The previousValue argument is the value of the first element present in the array.
+     *  - The currentValue argument is the value of the second element present in the array.
+     *
+     * @callback geomReduceCallback
+     * @param {*} previousValue The accumulated value previously returned in the last invocation
+     * of the callback, or initialValue, if supplied.
+     * @param {Geometry} currentGeometry The current Geometry being processed.
+     * @param {number} featureIndex The current index of the Feature being processed.
+     * @param {Object} featureProperties The current Feature Properties being processed.
+     * @param {Array<number>} featureBBox The current Feature BBox being processed.
+     * @param {number|string} featureId The current Feature Id being processed.
+     */
+
+    /**
+     * Reduce geometry in any GeoJSON object, similar to Array.reduce().
+     *
+     * @name geomReduce
+     * @param {FeatureCollection|Feature|Geometry} geojson any GeoJSON object
+     * @param {Function} callback a method that takes (previousValue, currentGeometry, featureIndex, featureProperties, featureBBox, featureId)
+     * @param {*} [initialValue] Value to use as the first argument to the first call of the callback.
+     * @returns {*} The value that results from the reduction.
+     * @example
+     * var features = turf.featureCollection([
+     *     turf.point([26, 37], {foo: 'bar'}),
+     *     turf.point([36, 53], {hello: 'world'})
+     * ]);
+     *
+     * turf.geomReduce(features, function (previousValue, currentGeometry, featureIndex, featureProperties, featureBBox, featureId) {
+     *   //=previousValue
+     *   //=currentGeometry
+     *   //=featureIndex
+     *   //=featureProperties
+     *   //=featureBBox
+     *   //=featureId
+     *   return currentGeometry
+     * });
+     */
+    function geomReduce(geojson, callback, initialValue) {
+      var previousValue = initialValue;
+      geomEach(
+        geojson,
+        function (
+          currentGeometry,
+          featureIndex,
+          featureProperties,
+          featureBBox,
+          featureId
+        ) {
+          if (featureIndex === 0 && initialValue === undefined)
+            previousValue = currentGeometry;
+          else
+            previousValue = callback(
+              previousValue,
+              currentGeometry,
+              featureIndex,
+              featureProperties,
+              featureBBox,
+              featureId
+            );
+        }
+      );
+      return previousValue;
+    }
+
+    // Note: change RADIUS => earthRadius
+    var RADIUS = 6378137;
+    /**
+     * Takes one or more features and returns their area in square meters.
+     *
+     * @name area
+     * @param {GeoJSON} geojson input GeoJSON feature(s)
+     * @returns {number} area in square meters
+     * @example
+     * var polygon = turf.polygon([[[125, -15], [113, -22], [154, -27], [144, -15], [125, -15]]]);
+     *
+     * var area = turf.area(polygon);
+     *
+     * //addToMap
+     * var addToMap = [polygon]
+     * polygon.properties.area = area
+     */
+    function area(geojson) {
+        return geomReduce(geojson, function (value, geom) {
+            return value + calculateArea(geom);
+        }, 0);
+    }
+    /**
+     * Calculate Area
+     *
+     * @private
+     * @param {Geometry} geom GeoJSON Geometries
+     * @returns {number} area
+     */
+    function calculateArea(geom) {
+        var total = 0;
+        var i;
+        switch (geom.type) {
+            case "Polygon":
+                return polygonArea(geom.coordinates);
+            case "MultiPolygon":
+                for (i = 0; i < geom.coordinates.length; i++) {
+                    total += polygonArea(geom.coordinates[i]);
+                }
+                return total;
+            case "Point":
+            case "MultiPoint":
+            case "LineString":
+            case "MultiLineString":
+                return 0;
+        }
+        return 0;
+    }
+    function polygonArea(coords) {
+        var total = 0;
+        if (coords && coords.length > 0) {
+            total += Math.abs(ringArea(coords[0]));
+            for (var i = 1; i < coords.length; i++) {
+                total -= Math.abs(ringArea(coords[i]));
+            }
+        }
+        return total;
+    }
+    /**
+     * @private
+     * Calculate the approximate area of the polygon were it projected onto the earth.
+     * Note that this area will be positive if ring is oriented clockwise, otherwise it will be negative.
+     *
+     * Reference:
+     * Robert. G. Chamberlain and William H. Duquette, "Some Algorithms for Polygons on a Sphere",
+     * JPL Publication 07-03, Jet Propulsion
+     * Laboratory, Pasadena, CA, June 2007 https://trs.jpl.nasa.gov/handle/2014/40409
+     *
+     * @param {Array<Array<number>>} coords Ring Coordinates
+     * @returns {number} The approximate signed geodesic area of the polygon in square meters.
+     */
+    function ringArea(coords) {
+        var p1;
+        var p2;
+        var p3;
+        var lowerIndex;
+        var middleIndex;
+        var upperIndex;
+        var i;
+        var total = 0;
+        var coordsLength = coords.length;
+        if (coordsLength > 2) {
+            for (i = 0; i < coordsLength; i++) {
+                if (i === coordsLength - 2) {
+                    // i = N-2
+                    lowerIndex = coordsLength - 2;
+                    middleIndex = coordsLength - 1;
+                    upperIndex = 0;
+                }
+                else if (i === coordsLength - 1) {
+                    // i = N-1
+                    lowerIndex = coordsLength - 1;
+                    middleIndex = 0;
+                    upperIndex = 1;
+                }
+                else {
+                    // i = 0 to N-3
+                    lowerIndex = i;
+                    middleIndex = i + 1;
+                    upperIndex = i + 2;
+                }
+                p1 = coords[lowerIndex];
+                p2 = coords[middleIndex];
+                p3 = coords[upperIndex];
+                total += (rad(p3[0]) - rad(p1[0])) * Math.sin(rad(p2[1]));
+            }
+            total = (total * RADIUS * RADIUS) / 2;
+        }
+        return total;
+    }
+    function rad(num) {
+        return (num * Math.PI) / 180;
+    }
+
     function loginfo(...str) {
       let info = str.shift();
       console.log(
@@ -755,6 +1094,14 @@
                                     )}</div>`
                                   : ""
                               }
+                            </div>
+                            <div class="col-12 text-center glass"> 
+                                Area: ${(area(feature) / 1000000)
+                                  .toFixed(2)
+                                  .replace(
+                                    /(\d)(?=(\d\d\d)+([^\d]|$))/g,
+                                    "$1 "
+                                  )} km²
                             </div>
                             <div class="col-12 text-center mt-2">
                               ${
