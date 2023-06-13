@@ -18,6 +18,7 @@ export default [
         targets: [
           { src: "src/index.html", dest: "dist" },
           { src: "src/index.css", dest: "dist" },
+          { src: "icons/*", dest: "dist/icons" },
         ],
       }),
     ],
