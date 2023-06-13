@@ -5,6 +5,8 @@ import {
   InspectControl,
 } from "mapbox-gl-controls";
 
+import area from "@turf/area";
+
 function loginfo(...str) {
   let info = str.shift();
   console.log(
@@ -252,6 +254,14 @@ window.onload = async () => {
                                     )}</div>`
                                   : ""
                               }
+                            </div>
+                            <div class="col-12 text-center glass"> 
+                                Area: ${(area(feature) / 1000000)
+                                  .toFixed(2)
+                                  .replace(
+                                    /(\d)(?=(\d\d\d)+([^\d]|$))/g,
+                                    "$1 "
+                                  )} km²
                             </div>
                             <div class="col-12 text-center mt-2">
                               ${
