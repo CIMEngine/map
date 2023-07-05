@@ -256,12 +256,7 @@ window.onload = async () => {
                               }
                             </div>
                             <div class="col-12 text-center glass"> 
-                                Area: ${(area(feature) / 1000000)
-                                  .toFixed(2)
-                                  .replace(
-                                    /(\d)(?=(\d\d\d)+([^\d]|$))/g,
-                                    "$1 "
-                                  )} km²
+                                Area: ${feature.properties.area} km²
                             </div>
                             <div class="col-12 text-center mt-2">
                               ${
