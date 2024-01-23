@@ -7,6 +7,7 @@ import CompassControl from "@mapbox-controls/compass";
 import InspectControl from "@mapbox-controls/inspect";
 import StylesControl from "@mapbox-controls/styles";
 import ZoomControl from "@mapbox-controls/zoom";
+import LanguageControl from "@mapbox-controls/language";
 
 import "@mapbox-controls/compass/src/index.css";
 import "@mapbox-controls/inspect/src/index.css";
@@ -17,6 +18,8 @@ import "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import showdown from "showdown";
+
+import l from "./locales";
 
 function loginfo(...str) {
   let info = str.shift();
@@ -43,7 +46,7 @@ window.onload = async () => {
   )[mapId];
 
   if (!mIdData) {
-    alert(`Map ${mapId} not found`);
+    alert(`Map "${mapId}" not found`);
   }
 
   let mData = {};
@@ -70,6 +73,7 @@ window.onload = async () => {
 
   mapboxgl.accessToken =
     "pk.eyJ1IjoiYXJ0ZWdvc2VyIiwiYSI6ImNrcDViN3BhcDAwbW0ydnBnOXZ0ZzFreXUifQ.FIVtaBNr9dr_TIw672Zqdw";
+
   let map = new mapboxgl.Map({
     container: "map",
     style: "mapbox://styles/artegoser/clfm612fg002601nlcika2018?optimize=true",
@@ -78,6 +82,9 @@ window.onload = async () => {
     projection: projection,
   });
 
+  map.addControl(new ZoomControl(), "top-right");
+  map.addControl(new CompassControl({ instant: true }), "top-right");
+  map.addControl(new LanguageControl());
   map.addControl(
     new StylesControl({
       styles: [
@@ -97,9 +104,6 @@ window.onload = async () => {
     }),
     "top-left"
   );
-
-  map.addControl(new ZoomControl(), "top-right");
-  map.addControl(new CompassControl({ instant: true }), "top-right");
 
   if (mData.debug) {
     map.addControl(new InspectControl({ console: true }), "bottom-right");
@@ -206,7 +210,11 @@ window.onload = async () => {
             `
                 ${
                   feature?.properties?.amount
-                    ? `<div class="row glass" style="color: "white";"><div class="col">Population - ${feature.properties.amount} people.</div></div>`
+                    ? `<div class="row glass" style="color: "white";"><div class="col">${l(
+                        "population"
+                      )} - ${feature.properties.amount} ${l(
+                        "people"
+                      )}.</div></div>`
                     : ""
                 }
                 <div class="row" style="padding: 5px;">
@@ -218,8 +226,8 @@ window.onload = async () => {
                   <div class="col-md-12 col-sm-12 text-center glass mb-2">
                     <h5 className="card-title">${feature.properties.name}
                       ${
-                        feature.properties.name_ru
-                          ? ` - ${feature.properties.name_ru}`
+                        feature.properties.translated_name
+                          ? ` - ${feature.properties.translated_name}`
                           : ""
                       }
                     </h5>
@@ -266,7 +274,9 @@ window.onload = async () => {
                                   ).join(", ")}
                             </div>
                             <div class="col-12 text-center glass"> 
-                                Founding date: ${country.date}
+                                ${l("founded")}: ${new Date(
+                    country.date
+                  ).toLocaleDateString()}
                             </div>
                             <div class="col-md-12 col-sm-12 text-center glass">
                               ${
@@ -278,12 +288,16 @@ window.onload = async () => {
                               }
                             </div>
                             <div class="col-12 text-center glass"> 
-                                Area: ${feature.properties.area} km²
+                                ${l("area")}: ${feature.properties.area} ${l(
+                    "km"
+                  )}²
                             </div>
                             <div class="col-12 text-center mt-2">
                               ${
                                 country.about
-                                  ? `<a href="${country.about}" class="about">About</a>`
+                                  ? `<a href="${
+                                      country.about
+                                    }" class="about">${l("about")}</a>`
                                   : ""
                               }
                             </div>
