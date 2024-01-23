@@ -6,6 +6,8 @@ let locales = {
     km: "km",
     about: "About",
     founded: "Founded",
+    streets: "Streets",
+    satellite: "Satellite",
   },
   ru: {
     population: "Население",
@@ -14,6 +16,8 @@ let locales = {
     km: "км",
     about: "Больше",
     founded: "Основано",
+    streets: "Улицы",
+    satellite: "Спутник",
   },
 };
 

@@ -19,6 +19,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 import { countryPopup, markerPopup } from "./components";
 
+import l from "./locales";
+
 function loginfo(...str) {
   let info = str.shift();
   console.log(
@@ -87,13 +89,13 @@ window.onload = async () => {
     new StylesControl({
       styles: [
         {
-          label: "Streets",
+          label: l("streets"),
           styleName: "Mapbox Streets",
           styleUrl:
             "mapbox://styles/artegoser/clfm612fg002601nlcika2018?optimize=true",
         },
         {
-          label: "Satellite",
+          label: l("satellite"),
           styleName: "Satellite",
           styleUrl:
             "mapbox://styles/artegoser/cliskjlhw00ug01pgfs9lesog?optimize=true",
