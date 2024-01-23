@@ -17,9 +17,7 @@ import "@mapbox-controls/zoom/src/index.css";
 import "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import showdown from "showdown";
-
-import l from "./locales";
+import { countryPopup, markerPopup } from "./components";
 
 function loginfo(...str) {
   let info = str.shift();
@@ -108,8 +106,6 @@ window.onload = async () => {
   if (mData.debug) {
     map.addControl(new InspectControl({ console: true }), "bottom-right");
   }
-
-  let converter = new showdown.Converter();
 
   map.on("style.load", async () => {
     map.loadImage(
@@ -206,42 +202,7 @@ window.onload = async () => {
         lasticocords = coordinates;
         return new mapboxgl.Popup()
           .setLngLat(coordinates)
-          .setHTML(
-            `
-                ${
-                  feature?.properties?.amount
-                    ? `<div class="row glass" style="color: "white";"><div class="col">${l(
-                        "population"
-                      )} - ${feature.properties.amount} ${l(
-                        "people"
-                      )}.</div></div>`
-                    : ""
-                }
-                <div class="row" style="padding: 5px;">
-                  ${
-                    feature?.properties?.img
-                      ? `<div class="col-md-12 col-sm-12" style="padding: 0px;"><img class="w-100 about-img" src="${feature.properties.img}" alt="${feature.properties.name} img"></div>`
-                      : ""
-                  }
-                  <div class="col-md-12 col-sm-12 text-center glass mb-2">
-                    <h5 className="card-title">${feature.properties.name}
-                      ${
-                        feature.properties.translated_name
-                          ? ` - ${feature.properties.translated_name}`
-                          : ""
-                      }
-                    </h5>
-                  </div>
-                  ${
-                    feature.properties.description
-                      ? `<div class="col-md-12 col-sm-12 text-center glass"><div>${converter.makeHtml(
-                          feature.properties.description
-                        )}</div></div>`
-                      : ""
-                  }
-                </div>
-                `
-          )
+          .setHTML(markerPopup(feature.properties))
           .addTo(map);
       } else if (
         feature.geometry.type === "Polygon" ||
@@ -255,54 +216,7 @@ window.onload = async () => {
             if (lasticocords !== coordinates)
               return new mapboxgl.Popup()
                 .setLngLat(coordinates)
-                .setHTML(
-                  `
-                    <div class="row" style="padding: 5px;">
-                            <div class="col-12 col-sm-12" style="padding: 0px;">
-                                    <img class="w-100 about-img" src="${
-                                      country.img
-                                    }">
-                            </div>
-                            <div class="col-12 text-center glass">
-                                    <h5>
-                                            ${country.name}
-                                    </h5>
-                            </div>
-                            <div class="col-12 text-center glass"> 
-                                  ${JSON.parse(
-                                    feature.properties.tags || "[]"
-                                  ).join(", ")}
-                            </div>
-                            <div class="col-12 text-center glass"> 
-                                ${l("founded")}: ${new Date(
-                    country.date
-                  ).toLocaleDateString()}
-                            </div>
-                            <div class="col-md-12 col-sm-12 text-center glass">
-                              ${
-                                country.description
-                                  ? `<div>${converter.makeHtml(
-                                      country.description
-                                    )}</div>`
-                                  : ""
-                              }
-                            </div>
-                            <div class="col-12 text-center glass"> 
-                                ${l("area")}: ${feature.properties.area} ${l(
-                    "km"
-                  )}²
-                            </div>
-                            <div class="col-12 text-center mt-2">
-                              ${
-                                country.about
-                                  ? `<a href="${
-                                      country.about
-                                    }" class="about">${l("about")}</a>`
-                                  : ""
-                              }
-                            </div>
-                    </div>`
-                )
+                .setHTML(countryPopup(country, feature.properties))
                 .addTo(map);
         }, 1);
       }
