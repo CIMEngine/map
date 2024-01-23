@@ -1,9 +1,22 @@
-import {
-  StylesControl,
-  ZoomControl,
-  CompassControl,
-  InspectControl,
-} from "mapbox-gl-controls";
+import "./index.css";
+
+import "bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
+
+import StylesControl from "@mapbox-controls/styles";
+import ZoomControl from "@mapbox-controls/zoom";
+import CompassControl from "@mapbox-controls/compass";
+import InspectControl from "@mapbox-controls/inspect";
+
+import "@mapbox-controls/styles/src/index.css";
+import "@mapbox-controls/zoom/src/index.css";
+import "@mapbox-controls/compass/src/index.css";
+import "@mapbox-controls/inspect/src/index.css";
+
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
+
+import showdown from "showdown";
 
 function loginfo(...str) {
   let info = str.shift();
@@ -29,9 +42,29 @@ window.onload = async () => {
     ).json()
   )[mapId];
 
-  const geoURL = params.geoURL || mapDataFromId.geoURL;
-  const countryInfoUrl = params.countryInfoURL || mapDataFromId.countryInfoURL;
-  const debug = params.debug || false;
+  if (mapDataFromId.external) {
+    mapDataFromId = await (await fetch(mapDataFromId.external)).json();
+  }
+
+  if (!mapDataFromId) {
+    alert(`Map ${mapId} not found`);
+  }
+
+  if (mapDataFromId.icon) {
+    document.getElementById("icon").setAttribute("href", mapDataFromId.icon);
+  }
+
+  let geoURL, countryInfoUrl, debug;
+
+  if (params.external) {
+    const data = await (await fetch(params.external)).json();
+
+    geoURL = data.geoURL;
+  }
+
+  geoURL = params.geoURL || mapDataFromId.geoURL;
+  countryInfoUrl = params.countryInfoURL || mapDataFromId.countryInfoURL;
+  debug = params.debug || false;
 
   mapboxgl.accessToken =
     "pk.eyJ1IjoiYXJ0ZWdvc2VyIiwiYSI6ImNrcDViN3BhcDAwbW0ydnBnOXZ0ZzFreXUifQ.FIVtaBNr9dr_TIw672Zqdw";
@@ -64,18 +97,7 @@ window.onload = async () => {
   );
 
   map.addControl(new ZoomControl(), "top-right");
-  map.addControl(new CompassControl(), "top-right");
-  map.addControl(
-    new MapboxExportControl({
-      PageSize: Size.A3,
-      PageOrientation: PageOrientation.Portrait,
-      Format: Format.PNG,
-      DPI: DPI[96],
-      Crosshair: true,
-      PrintableArea: true,
-    }),
-    "top-right"
-  );
+  map.addControl(new CompassControl(), "bottom-right");
 
   if (debug) {
     map.addControl(new InspectControl(), "bottom-right");
