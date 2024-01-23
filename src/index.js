@@ -1,20 +1,20 @@
 import "./index.css";
 
-import "bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
-
-import StylesControl from "@mapbox-controls/styles";
-import ZoomControl from "@mapbox-controls/zoom";
-import CompassControl from "@mapbox-controls/compass";
-import InspectControl from "@mapbox-controls/inspect";
-
-import "@mapbox-controls/styles/src/index.css";
-import "@mapbox-controls/zoom/src/index.css";
-import "@mapbox-controls/compass/src/index.css";
-import "@mapbox-controls/inspect/src/index.css";
-
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+
+import CompassControl from "@mapbox-controls/compass";
+import InspectControl from "@mapbox-controls/inspect";
+import StylesControl from "@mapbox-controls/styles";
+import ZoomControl from "@mapbox-controls/zoom";
+
+import "@mapbox-controls/compass/src/index.css";
+import "@mapbox-controls/inspect/src/index.css";
+import "@mapbox-controls/styles/src/index.css";
+import "@mapbox-controls/zoom/src/index.css";
+
+import "bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 import showdown from "showdown";
 
@@ -34,7 +34,7 @@ window.onload = async () => {
   const projection = params.projection || "globe";
   const mapId = params.id || "worldMap";
 
-  let mapDataFromId = (
+  let mIdData = (
     await (
       await fetch(
         `https://raw.githubusercontent.com/CIMEngine/MapList/main/index.json`
@@ -42,29 +42,35 @@ window.onload = async () => {
     ).json()
   )[mapId];
 
-  if (mapDataFromId.external) {
-    mapDataFromId = await (await fetch(mapDataFromId.external)).json();
+  if (mIdData.external) {
+    mIdData = await (await fetch(mIdData.external)).json();
   }
 
-  if (!mapDataFromId) {
+  if (!mIdData) {
     alert(`Map ${mapId} not found`);
   }
 
-  if (mapDataFromId.icon) {
-    document.getElementById("icon").setAttribute("href", mapDataFromId.icon);
-  }
-
-  let geoURL, countryInfoUrl, debug;
+  let mData = {};
 
   if (params.external) {
     const data = await (await fetch(params.external)).json();
 
-    geoURL = data.geoURL;
+    mData.geoURL = data.geoURL;
   }
 
-  geoURL = params.geoURL || mapDataFromId.geoURL;
-  countryInfoUrl = params.countryInfoURL || mapDataFromId.countryInfoURL;
-  debug = params.debug || false;
+  mData.geoURL = params.geoURL || mIdData.geoURL;
+  mData.countryInfoUrl = params.countryInfoURL || mIdData.countryInfoURL;
+  mData.debug = params.debug || false;
+  mData.icon = params.icon || mIdData.icon;
+  mData.name = params.name || mIdData.name;
+
+  if (mData.icon) {
+    document.getElementById("icon").setAttribute("href", mData.icon);
+  }
+
+  if (mData.name) {
+    document.title = mData.name;
+  }
 
   mapboxgl.accessToken =
     "pk.eyJ1IjoiYXJ0ZWdvc2VyIiwiYSI6ImNrcDViN3BhcDAwbW0ydnBnOXZ0ZzFreXUifQ.FIVtaBNr9dr_TIw672Zqdw";
@@ -97,10 +103,10 @@ window.onload = async () => {
   );
 
   map.addControl(new ZoomControl(), "top-right");
-  map.addControl(new CompassControl(), "bottom-right");
+  map.addControl(new CompassControl({ instant: true }), "top-right");
 
-  if (debug) {
-    map.addControl(new InspectControl(), "bottom-right");
+  if (mData.debug) {
+    map.addControl(new InspectControl({ console: true }), "bottom-right");
   }
 
   let converter = new showdown.Converter();
@@ -134,7 +140,7 @@ window.onload = async () => {
     let lasticocords;
 
     loginfo("Getting country data");
-    let coarray = await fetch(countryInfoUrl);
+    let coarray = await fetch(mData.countryInfoUrl);
     coarray = await coarray.json();
     let countries = {};
     for (let i = 0; i < coarray.length; i++)
@@ -142,7 +148,7 @@ window.onload = async () => {
 
     map.addSource("map-data", {
       type: "geojson",
-      data: geoURL,
+      data: mData.geoURL,
     });
 
     map.addLayer({

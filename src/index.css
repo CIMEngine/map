@@ -1,4 +1,4 @@
-.mapboxgl-popup-tip{
+.mapboxgl-popup-tip {
   display: none;
 }
 
@@ -6,7 +6,7 @@
   display: none;
 }
 
-.mapboxgl-popup-content{
+.mapboxgl-popup-content {
   background: #fff0 !important;
   padding: 0 !important;
   box-shadow: none !important;
@@ -14,30 +14,30 @@
 
 .about {
   text-decoration: none;
-  padding: 5px; 
-  transition: .25s;
+  padding: 5px;
+  transition: 0.25s;
   margin-top: 5px;
 }
 
-
-
-.glass, .about, .menu {
+.glass,
+.about,
+.menu {
   background: rgba(120, 120, 120, 0.411) !important;
-  box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 ) !important;
-  backdrop-filter: blur( 20px ) !important;
-  -webkit-backdrop-filter: blur( 20px ) !important;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
   border-radius: 20px !important;
-  border: 1px solid rgba( 255, 255, 255, 0.18 ) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
   color: white !important;
 }
 
 .about:hover {
-  transition: .25s;
+  transition: 0.25s;
   background: rgba(48, 48, 48, 0.3) !important;
 }
 
-.about-img{
-  border-radius: 20px; 
+.about-img {
+  border-radius: 20px;
   margin-bottom: 5px;
 }
 
