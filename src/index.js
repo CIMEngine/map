@@ -10,7 +10,7 @@ function loginfo(...str) {
   console.log(
     `%c ${info} `,
     "color:white; background-color: #78d6fa; border-radius:10px;",
-    ...str,
+    ...str
   );
 }
 window.onload = async () => {
@@ -24,7 +24,7 @@ window.onload = async () => {
   let mapDataFromId = (
     await (
       await fetch(
-        `https://raw.githubusercontent.com/CIMEngine/MapList/main/index.json`,
+        `https://raw.githubusercontent.com/CIMEngine/MapList/main/index.json`
       )
     ).json()
   )[mapId];
@@ -60,7 +60,7 @@ window.onload = async () => {
         },
       ],
     }),
-    "top-left",
+    "top-left"
   );
 
   map.addControl(new ZoomControl(), "top-right");
@@ -74,7 +74,7 @@ window.onload = async () => {
       Crosshair: true,
       PrintableArea: true,
     }),
-    "top-right",
+    "top-right"
   );
 
   if (debug) {
@@ -89,7 +89,7 @@ window.onload = async () => {
       (error, image) => {
         if (error) throw error;
         map.addImage("city", image);
-      },
+      }
     );
 
     map.loadImage(
@@ -98,7 +98,7 @@ window.onload = async () => {
         if (error) throw error;
         map.addImage("capital-city", image);
         map.addImage("capital", image);
-      },
+      }
     );
 
     map.loadImage(
@@ -106,7 +106,7 @@ window.onload = async () => {
       (error, image) => {
         if (error) throw error;
         map.addImage("landmark-0", image);
-      },
+      }
     );
 
     let lasticocords;
@@ -180,31 +180,35 @@ window.onload = async () => {
           .setLngLat(coordinates)
           .setHTML(
             `
-                ${feature?.properties?.amount
-              ? `<div class="row glass" style="color: "white";"><div class="col">Population - ${feature.properties.amount} people.</div></div>`
-              : ""
-            }
+                ${
+                  feature?.properties?.amount
+                    ? `<div class="row glass" style="color: "white";"><div class="col">Population - ${feature.properties.amount} people.</div></div>`
+                    : ""
+                }
                 <div class="row" style="padding: 5px;">
-                  ${feature?.properties?.img
-              ? `<div class="col-md-12 col-sm-12" style="padding: 0px;"><img class="w-100 about-img" src="${feature.properties.img}" alt="${feature.properties.name} img"></div>`
-              : ""
-            }
+                  ${
+                    feature?.properties?.img
+                      ? `<div class="col-md-12 col-sm-12" style="padding: 0px;"><img class="w-100 about-img" src="${feature.properties.img}" alt="${feature.properties.name} img"></div>`
+                      : ""
+                  }
                   <div class="col-md-12 col-sm-12 text-center glass mb-2">
                     <h5 className="card-title">${feature.properties.name}
-                      ${feature.properties.name_ru
-              ? ` - ${feature.properties.name_ru}`
-              : ""
-            }
+                      ${
+                        feature.properties.name_ru
+                          ? ` - ${feature.properties.name_ru}`
+                          : ""
+                      }
                     </h5>
                   </div>
-                  ${feature.properties.description
-              ? `<div class="col-md-12 col-sm-12 text-center glass"><div>${converter.makeHtml(
-                feature.properties.description,
-              )}</div></div>`
-              : ""
-            }
+                  ${
+                    feature.properties.description
+                      ? `<div class="col-md-12 col-sm-12 text-center glass"><div>${converter.makeHtml(
+                          feature.properties.description
+                        )}</div></div>`
+                      : ""
+                  }
                 </div>
-                `,
+                `
           )
           .addTo(map);
       } else if (
@@ -223,8 +227,9 @@ window.onload = async () => {
                   `
                     <div class="row" style="padding: 5px;">
                             <div class="col-12 col-sm-12" style="padding: 0px;">
-                                    <img class="w-100 about-img" src="${country.img
-                  }">
+                                    <img class="w-100 about-img" src="${
+                                      country.img
+                                    }">
                             </div>
                             <div class="col-12 text-center glass">
                                     <h5>
@@ -233,30 +238,32 @@ window.onload = async () => {
                             </div>
                             <div class="col-12 text-center glass"> 
                                   ${JSON.parse(
-                    feature.properties.tags || "[]",
-                  ).join(", ")}
+                                    feature.properties.tags || "[]"
+                                  ).join(", ")}
                             </div>
                             <div class="col-12 text-center glass"> 
                                 Founding date: ${country.date}
                             </div>
                             <div class="col-md-12 col-sm-12 text-center glass">
-                              ${country.description
-                    ? `<div>${converter.makeHtml(
-                      country.description,
-                    )}</div>`
-                    : ""
-                  }
+                              ${
+                                country.description
+                                  ? `<div>${converter.makeHtml(
+                                      country.description
+                                    )}</div>`
+                                  : ""
+                              }
                             </div>
                             <div class="col-12 text-center glass"> 
                                 Area: ${feature.properties.area} km²
                             </div>
                             <div class="col-12 text-center mt-2">
-                              ${country.about
-                    ? `<a href="${country.about}" class="about">About</a>`
-                    : ""
-                  }
+                              ${
+                                country.about
+                                  ? `<a href="${country.about}" class="about">About</a>`
+                                  : ""
+                              }
                             </div>
-                    </div>`,
+                    </div>`
                 )
                 .addTo(map);
         }, 1);
