@@ -42,20 +42,16 @@ window.onload = async () => {
     ).json()
   )[mapId];
 
-  if (mIdData.external) {
-    mIdData = await (await fetch(mIdData.external)).json();
-  }
-
   if (!mIdData) {
     alert(`Map ${mapId} not found`);
   }
 
   let mData = {};
 
-  if (params.external) {
-    const data = await (await fetch(params.external)).json();
+  mData.external = params.external || mIdData.external;
 
-    mData.geoURL = data.geoURL;
+  if (mData.external) {
+    mData = await (await fetch(mData.external)).json();
   }
 
   mData.geoURL = params.geoURL || mIdData.geoURL;
