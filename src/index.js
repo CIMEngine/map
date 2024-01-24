@@ -31,7 +31,7 @@ window.onload = async () => {
   const mapId = params.id || "worldMap";
 
   info("Loading", mapId);
-  let mIdData = (
+  let mData = (
     await (
       await fetch(
         `https://raw.githubusercontent.com/CIMEngine/MapList/main/index.json`
@@ -39,17 +39,13 @@ window.onload = async () => {
     ).json()
   )[mapId];
 
-  if (!mIdData) {
+  if (!mData) {
     error(`Map "${mapId}" not found`);
   }
 
-  let mData = {};
-
-  mData.external = params.external || mIdData.external;
-
-  if (mData.external) {
-    info("Getting data from external", mData.external);
-    mData = await (await fetch(mData.external)).json();
+  if (params.external || mData.external) {
+    info("Getting data from external", params.external || mData.external);
+    mData = await (await fetch(params.external || mData.external)).json();
   }
 
   mData.geoURL = params.geoURL || mData.geoURL;
