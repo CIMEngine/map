@@ -20,15 +20,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { countryPopup, markerPopup } from "./components";
 
 import l from "./locales";
+import { info, error, log } from "./logging";
 
-function loginfo(...str) {
-  let info = str.shift();
-  console.log(
-    `%c ${info} `,
-    "color:white; background-color: #78d6fa; border-radius:10px;",
-    ...str
-  );
-}
 window.onload = async () => {
   const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
@@ -37,6 +30,7 @@ window.onload = async () => {
   const projection = params.projection || "globe";
   const mapId = params.id || "worldMap";
 
+  info("Loading", mapId);
   let mIdData = (
     await (
       await fetch(
@@ -46,7 +40,7 @@ window.onload = async () => {
   )[mapId];
 
   if (!mIdData) {
-    alert(`Map "${mapId}" not found`);
+    error(`Map "${mapId}" not found`);
   }
 
   let mData = {};
@@ -54,20 +48,23 @@ window.onload = async () => {
   mData.external = params.external || mIdData.external;
 
   if (mData.external) {
+    info("Getting data from external", mData.external);
     mData = await (await fetch(mData.external)).json();
   }
 
-  mData.geoURL = params.geoURL || mIdData.geoURL;
-  mData.countryInfoUrl = params.countryInfoURL || mIdData.countryInfoURL;
+  mData.geoURL = params.geoURL || mData.geoURL;
+  mData.countryInfoUrl = params.countryInfoURL || mData.countryInfoURL;
   mData.debug = params.debug || false;
-  mData.icon = params.icon || mIdData.icon;
-  mData.name = params.name || mIdData.name;
+  mData.icon = params.icon || mData.icon;
+  mData.name = params.name || mData.name;
 
   if (mData.icon) {
+    info("Setting icon", mData.icon);
     document.getElementById("icon").setAttribute("href", mData.icon);
   }
 
   if (mData.name) {
+    info("Setting title", mData.name);
     document.title = mData.name;
   }
 
@@ -82,6 +79,7 @@ window.onload = async () => {
     projection: projection,
   });
 
+  info("Adding controls");
   map.addControl(new ZoomControl(), "top-right");
   map.addControl(new CompassControl({ instant: true }), "top-right");
   map.addControl(new LanguageControl());
@@ -110,6 +108,7 @@ window.onload = async () => {
   }
 
   map.on("style.load", async () => {
+    info("Loading icons");
     map.loadImage(
       "https://cimengine.github.io/map/icons/city.png",
       (error, image) => {
@@ -137,18 +136,23 @@ window.onload = async () => {
 
     let lasticocords;
 
-    loginfo("Getting country data");
+    info("Getting country data from", mData.countryInfoUrl);
     let coarray = await fetch(mData.countryInfoUrl);
     coarray = await coarray.json();
     let countries = {};
+
+    info("Adding country data", `${coarray.length} countries`);
     for (let i = 0; i < coarray.length; i++)
       countries[coarray[i].idc] = coarray[i];
 
+    info("Adding map data", mData.geoURL);
     map.addSource("map-data", {
       type: "geojson",
       data: mData.geoURL,
     });
 
+    info("---Adding layers---");
+    log("map-data-fill-outline");
     map.addLayer({
       id: "map-data-fill-outline",
       type: "line",
@@ -160,6 +164,7 @@ window.onload = async () => {
       },
     });
 
+    log("map-data-fill");
     map.addLayer({
       id: "map-data-fill",
       type: "fill",
@@ -170,6 +175,7 @@ window.onload = async () => {
       },
     });
 
+    log("map-data-symbol");
     map.addLayer({
       id: "map-data-symbol",
       type: "symbol",
@@ -180,7 +186,9 @@ window.onload = async () => {
       },
       minzoom: 3,
     });
+    info("---Layers added---");
 
+    info("Adding event listeners for clicks");
     map.on("click", "map-data-fill", (e) => {
       const coordinates = e.lngLat;
       while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
