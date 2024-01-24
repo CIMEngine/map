@@ -7,21 +7,15 @@ export function countryPopup(country, properties) {
   return `<div class="row" style="padding: 5px;">
   ${img(country.img)}
   ${title(country.name)}
-  <div class="col-12 text-center glass"> 
-        ${JSON.parse(properties.tags || "[]").join(", ")}
-  </div>
-  <div class="col-12 text-center glass"> 
-      ${l("founded")}: ${new Date(country.date).toLocaleDateString()}
-  </div>
-  <div class="col-md-12 col-sm-12 text-center glass">
+  <div class="col-12 glass p-2"> 
+    ${JSON.parse(properties.tags || "[]").join(", ")}
+    ${l("founded")}: ${new Date(country.date).toLocaleDateString()}
     ${
       country.description
         ? `<div>${converter.makeHtml(country.description)}</div>`
         : ""
     }
-  </div>
-  <div class="col-12 text-center glass"> 
-      ${l("area")}: ${properties.area} ${l("km")}²
+    ${l("area")}: ${properties.area} ${l("km")}²
   </div>
   <div class="col-12 text-center mt-2">
     ${
@@ -38,7 +32,7 @@ function img(url) {
 }
 
 function title(name) {
-  return `<div class="col-12 text-center glass"><h5>${name}</h5></div>`;
+  return `<div class="col-12 text-center glass mb-2 pt-2"><h5>${name}</h5></div>`;
 }
 
 export function markerPopup(properties) {

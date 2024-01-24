@@ -1,4 +1,4 @@
-import "./index.css";
+import "./styles/index.css";
 
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
