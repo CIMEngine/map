@@ -3,6 +3,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import copy from "rollup-plugin-copy";
 import css from "rollup-plugin-import-css";
 import terser from "@rollup/plugin-terser";
+import ejs from "rollup-plugin-ejs";
 
 export default [
   {
@@ -19,6 +20,7 @@ export default [
         output: "index.css",
         minify: true,
       }),
+      ejs(),
       resolve(),
       commonjs(),
       copy({

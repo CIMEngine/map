@@ -1,0 +1,9 @@
+<% 
+
+  let tagstxt = JSON.parse(locals.tags || "[]").join(", ");
+
+  if (tagstxt) {
+    %> <div class="col-12 glass p-2 text-center mb-2"> <%= tagstxt %> </div> <%
+  }
+
+%>

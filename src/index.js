@@ -17,7 +17,7 @@ import "@mapbox-controls/zoom/src/index.css";
 import "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import { countryPopup, markerPopup } from "./components";
+import { countryPopup, markerPopup } from "./components/components";
 
 import l from "./locales";
 import { info, error, log } from "./logging";

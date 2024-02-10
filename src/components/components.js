@@ -1,5 +1,7 @@
 import { Converter } from "showdown";
-import l from "./locales";
+import l from "../locales";
+
+import tags from "./country/tags.ejs";
 
 let converter = new Converter();
 
@@ -7,7 +9,7 @@ export function countryPopup(country, properties) {
   return `<div class="row" style="padding: 5px;">
   ${img(country.img)}
   ${title(country.name)}
-  ${tags(properties.tags)}
+  ${tags({ tags: properties.tags })}
   <div class="col-12 glass p-2"> 
     ${l("founded")}: ${new Date(country.date).toLocaleDateString()}<br/>
     ${
@@ -25,14 +27,6 @@ export function countryPopup(country, properties) {
     }
   </div>
 </div>`;
-}
-
-function tags(tags) {
-  let tagstxt = JSON.parse(tags || "[]").join(", ");
-
-  return tagstxt
-    ? `<div class="col-12 glass p-2 text-center mb-2"> ${tagstxt}</div>`
-    : "";
 }
 
 function img(url) {

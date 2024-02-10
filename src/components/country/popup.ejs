@@ -1,0 +1,21 @@
+<div class="row" style="padding: 5px;">
+  <%= include("./img.ejs") %>
+  <%= include("./title.ejs") %>
+  <%= include("./tags.ejs") %>
+  <div class="col-12 glass p-2"> 
+    ${l("founded")}: ${new Date(country.date).toLocaleDateString()}<br/>
+    ${
+      country.description
+        ? `<div>${converter.makeHtml(country.description)}</div>`
+        : ""
+    }<br/>
+    ${l("area")}: ${properties.area} ${l("km")}²
+  </div>
+  <div class="col-12 text-center mt-2">
+    ${
+      country.about
+        ? `<a href="${country.about}" class="about">${l("about")}</a>`
+        : ""
+    }
+  </div>
+</div>
